@@ -4,8 +4,12 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const flash = require('connect-flash');
 const session = require('express-session');
+const passport = require('passport');
 
 const app = express();
+
+//  Passport config
+require('./config/passport')(passport);
 
 //  DB Config
 const db = require('./config/keys').MongoURI;
@@ -34,6 +38,10 @@ app.use(session({
     saveUninitialized: true
 }));
 
+//  Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
 //  Connect flash
 app.use(flash());
 
@@ -41,6 +49,7 @@ app.use(flash());
 app.use((req, res, next) => {
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
     next();
 });
 
